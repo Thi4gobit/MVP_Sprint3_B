@@ -7,7 +7,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = 'django-insecure-xav-1h&fix5hz@lkm^i$@#+q^avxw@vrl4c9+tanv+6#z0$rm('
 DEBUG = True
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 APPS_DIR = Path(BASE_DIR) / 'apps'

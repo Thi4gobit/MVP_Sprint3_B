@@ -2,6 +2,7 @@ from django.db import models
 
 
 class State(models.Model):
+    
     name = models.CharField(max_length=32)
     code = models.CharField(max_length=32)
 
@@ -20,8 +21,6 @@ class Workout(models.Model):
     duration = models.DurationField()
     bpm = models.IntegerField()
     kcal = models.IntegerField()
-    # bpm = models.CharField(max_length=16)
-    # kcal = models.CharField(max_length=16)
 
     def __str__(self):
         return f'{self.date} - {self.kilometers} ({self.state})'

@@ -45,7 +45,7 @@ def get(request):
 @api_view(['POST'])
 def post(request):
     if request.method == 'POST':
-        serializer = WorkoutSerializer(data=request.data, many=True)
+        serializer = WorkoutSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(
