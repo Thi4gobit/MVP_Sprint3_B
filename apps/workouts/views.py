@@ -5,6 +5,17 @@ from rest_framework.response import Response
 from .models import Workout
 from .serializers import WorkoutSerializer
 from drf_spectacular.utils import extend_schema, OpenApiExample
+import requests
+
+
+def get_temperature(city_name, uf, date, time_hour):
+    KEY = 'b4a3ccab'
+    response = requests.get(f"https://api.hgbrasil.com/weather?key={KEY}&city_name={city_name},{uf}&date={date}&date=hourly")
+    if response.status_code == 200:
+        data = response.json()
+        print(data)
+    else:
+        print(f"Erro: {response.status_code}")
 
 
 @extend_schema(
@@ -47,6 +58,9 @@ def post(request):
     if request.method == 'POST':
         serializer = WorkoutSerializer(data=request.data)
         if serializer.is_valid():
+
+            serializer.validated_data.get('', None)
+
             serializer.save()
             return Response(
                 {"message": f"Successfully."},
