@@ -97,17 +97,10 @@ class PostTestCase(TestCase):
         """
         Ignore speed field
         """
-        #{"date": "2024-09-01","kilometers": "10.01","duration": "50:05:00"}
         data = {
             "date": TODAY, 
-            #"time": "10:00", 
-            #"city": "Rio de Janeiro", 
-            #"state": "RJ", 
             "kilometers": "10.00", 
             "duration": "00:60:00", 
-            #"frequency": "150", 
-            #"kcal": "600", 
-            #"temperature": "", 
             "speed": "30", 
         }
         request = self.client.post(
