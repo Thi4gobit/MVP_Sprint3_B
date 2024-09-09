@@ -9,21 +9,15 @@ from datetime import datetime, timedelta, date
 from .api_outside import get_temperature
 
 
-
-
-def is_today(day):
-    return day == date.today()
-
-
-def time_on_time(time):
-    now = datetime.now().time()
-    one_hour_back = (
-        datetime.combine(datetime.today(), now) - timedelta(hours=1)
-    ).time()
-    one_hour_forward = (
-        datetime.combine(datetime.today(), now) + timedelta(hours=1)
-    ).time()
-    return one_hour_back <= time <= one_hour_forward
+# def time_on_time(time):
+#     now = datetime.now().time()
+#     one_hour_back = (
+#         datetime.combine(datetime.today(), now) - timedelta(hours=1)
+#     ).time()
+#     one_hour_forward = (
+#         datetime.combine(datetime.today(), now) + timedelta(hours=1)
+#     ).time()
+#     return one_hour_back <= time <= one_hour_forward
 
 
 @extend_schema(
@@ -55,8 +49,14 @@ def get(request):
             name='New register of one instance',
             description='',
             value={
-                '???': '???',
-                '???': '???'
+                "date": f"{date.today()}", 
+                "time": f"{datetime.now().strftime("%H:%M:%S")}",
+                "city": "Rio de Janeiro",
+                "state": "RJ",
+                "kilometers": "10.00", 
+                "duration": "00:60:00", 
+                "frequency": 150,
+                "kcal": 600,
             }
         ),
     ],
@@ -67,13 +67,22 @@ def post(request):
         serializer = WorkoutSerializer(data=request.data)
         if serializer.is_valid():
             time = serializer.validated_data.get('time', None)
-            date = serializer.validated_data.get('date', None)
+            day = serializer.validated_data.get('date', None)
             city = serializer.validated_data.get('city', None)
             state = serializer.validated_data.get('state', None)
             temperature = None
             if time and date and city and state:
-                if is_today(date):
-                    if time_on_time(time):
+                if day == date.today():
+                    now = datetime.now().time()
+                    one_hour_back = (
+                        datetime.combine(
+                            datetime.today(), now) - timedelta(hours=1)
+                    ).time()
+                    one_hour_forward = (
+                        datetime.combine(
+                            datetime.today(), now) + timedelta(hours=1)
+                    ).time()
+                    if one_hour_back <= time <= one_hour_forward:
                         t = get_temperature(
                             city_name=city, uf=state, date=date
                         )
