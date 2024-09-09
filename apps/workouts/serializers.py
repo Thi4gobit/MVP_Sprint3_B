@@ -6,6 +6,7 @@ from datetime import timedelta, date
 class WorkoutSerializer(serializers.ModelSerializer):
 
     duration = serializers.CharField()
+    speed = serializers.ReadOnlyField()
 
     class Meta:
         model = Workout
