@@ -2,7 +2,6 @@ import sys
 from pathlib import Path
 
 
-
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = 'django-insecure-xav-1h&fix5hz@lkm^i$@#+q^avxw@vrl4c9+tanv+6#z0$rm('
@@ -109,11 +108,12 @@ MEDIA_URL = '/media/'
 #------------------------------------------------------------------------------
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 #------------------------------------------------------------------------------
-# CORS_ALLOWED_ORIGINS = [
-#     # os domínios que são confiáveis para enviar requisições potencialmente
-#     # perigosas (como POST) ao seu backend
-#     'http://localhost:5000',
-# ]
+CORS_ALLOWED_ORIGINS = [
+    # os domínios que são confiáveis para enviar requisições potencialmente
+    # perigosas (como POST) ao seu backend
+    'http://localhost:5000',
+    'http://127.0.0.1:5000',
+]
 #------------------------------------------------------------------------------
 SPECTACULAR_SETTINGS = {
     'TITLE': 'CYCLING',
