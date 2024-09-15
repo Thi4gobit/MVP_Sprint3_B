@@ -5,6 +5,19 @@ from rest_framework.response import Response
 from .models import Workout
 from .serializers import WorkoutSerializer
 from drf_spectacular.utils import extend_schema, OpenApiExample
+from datetime import datetime, timedelta, date
+from .api_outside import get_temperature
+
+
+# def time_on_time(time):
+#     now = datetime.now().time()
+#     one_hour_back = (
+#         datetime.combine(datetime.today(), now) - timedelta(hours=1)
+#     ).time()
+#     one_hour_forward = (
+#         datetime.combine(datetime.today(), now) + timedelta(hours=1)
+#     ).time()
+#     return one_hour_back <= time <= one_hour_forward
 
 
 @extend_schema(
@@ -36,8 +49,14 @@ def get(request):
             name='New register of one instance',
             description='',
             value={
-                '???': '???',
-                '???': '???'
+                "date": f"{date.today()}", 
+                "time": f"{datetime.now().strftime("%H:%M:%S")}",
+                "city": "Rio de Janeiro",
+                "state": "RJ",
+                "kilometers": "10.00", 
+                "duration": "00:60:00", 
+                "frequency": 150,
+                "kcal": 600,
             }
         ),
     ],
@@ -47,11 +66,40 @@ def post(request):
     if request.method == 'POST':
         serializer = WorkoutSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
+            time = serializer.validated_data.get('time', None)
+            day = serializer.validated_data.get('date', None)
+            city = serializer.validated_data.get('city', None)
+            state = serializer.validated_data.get('state', None)
+            temperature = None
+            if time and date and city and state:
+                if day == date.today():
+                    now = datetime.now().time()
+                    one_hour_back = (
+                        datetime.combine(
+                            datetime.today(), now) - timedelta(hours=1)
+                    ).time()
+                    one_hour_forward = (
+                        datetime.combine(
+                            datetime.today(), now) + timedelta(hours=1)
+                    ).time()
+                    if one_hour_back <= time <= one_hour_forward:
+                        t = get_temperature(
+                            city_name=city, uf=state, date=date
+                        )
+                        if 'temp' in t:
+                            temperature = t['temp']
+            instance = serializer.save()
+            if temperature:
+                instance.temperature = temperature
+                instance.save()
+                return Response(
+                    {"message": f"Saved."},
+                    status=status.HTTP_200_OK
+                )
             return Response(
-                {"message": f"Successfully."},
-                status=status.HTTP_200_OK
-            )
+                    {"message": f"Temperature not found. Saved without it."},
+                    status=status.HTTP_200_OK
+                )
         return Response(
             serializer.errors, status=status.HTTP_400_BAD_REQUEST
         )

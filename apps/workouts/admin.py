@@ -1,18 +1,14 @@
 from django.contrib import admin 
-from .models import Workout, State
-
-
-class StateAdmin(admin.ModelAdmin):
-    list_display = ('pk', 'name', 'code')
+from .models import Workout
 
 
 class WorkoutAdmin(admin.ModelAdmin):
     list_display = (
-        'pk', 'date', 'state', 'kilometers', 'duration', 'bpm', 'kcal'
+        'pk', 'date', 'city', 'state', 'kilometers', 
+        'duration', 'frequency', 'kcal', 'speed'
     )
     search_fields = ['date']
     list_filter = ['state']
 
 
-admin.site.register(State, StateAdmin)
 admin.site.register(Workout, WorkoutAdmin)
