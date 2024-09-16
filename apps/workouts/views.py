@@ -6,18 +6,26 @@ from .models import Workout
 from .serializers import WorkoutSerializer
 from drf_spectacular.utils import extend_schema, OpenApiExample
 from datetime import datetime, timedelta, date
-from .api_outside import get_temperature
+import requests
 
 
-# def time_on_time(time):
-#     now = datetime.now().time()
-#     one_hour_back = (
-#         datetime.combine(datetime.today(), now) - timedelta(hours=1)
-#     ).time()
-#     one_hour_forward = (
-#         datetime.combine(datetime.today(), now) + timedelta(hours=1)
-#     ).time()
-#     return one_hour_back <= time <= one_hour_forward
+def get_temperature(city_name, uf, date):
+    KEY = 'b4a3ccab'
+    response = requests.get(f"https://api.hgbrasil.com/weather?key={KEY}&city_name={city_name},{uf}&date={date}&mode=all&fields=only_results,time,temp,forecast,max,min,date")
+    if response.status_code == 200:
+        return response.json()
+    return response.json(), response.status_code
+
+
+def is_time_within_range(time):
+    now = datetime.now().time()
+    one_hour_back = (
+        datetime.combine(datetime.today(), now) - timedelta(hours=1)
+    ).time()
+    one_hour_forward = (
+        datetime.combine(datetime.today(), now) + timedelta(hours=1)
+    ).time()
+    return one_hour_back <= time <= one_hour_forward
 
 
 @extend_schema(
@@ -46,8 +54,17 @@ def get(request):
     request=WorkoutSerializer,
     examples=[
         OpenApiExample(
-            name='New register of one instance',
-            description='',
+            name='Minimum required',
+            description='Only required fields.',
+            value={
+                "date": f"{date.today()}", 
+                "kilometers": "10.00", 
+                "duration": "00:60:00"
+            }
+        ),
+        OpenApiExample(
+            name='All fields except temperature',
+            description='The system can only retrieve the temperature within a one-hour time window.',
             value={
                 "date": f"{date.today()}", 
                 "time_of_the_day": f"{datetime.now().strftime("%H:%M:%S")}",
@@ -57,6 +74,21 @@ def get(request):
                 "duration": "00:60:00", 
                 "frequency": 150,
                 "kcal": 600,
+            }
+        ),
+        OpenApiExample(
+            name='All fields',
+            description='When the temperature is provided, the system does not fetch it externally.',
+            value={
+                "date": f"{date.today()}", 
+                "time_of_the_day": f"{datetime.now().strftime("%H:%M:%S")}",
+                "city": "Rio de Janeiro",
+                "state": "RJ",
+                "kilometers": "10.00", 
+                "duration": "00:60:00", 
+                "frequency": 150,
+                "kcal": 600,
+                "temperature": "54"
             }
         ),
     ],
@@ -70,27 +102,20 @@ def post(request):
             day = serializer.validated_data.get('date', None)
             city = serializer.validated_data.get('city', None)
             state = serializer.validated_data.get('state', None)
-            temperature = None
-            if time and day and city and state:
+            temp = serializer.validated_data.get('temperature', None)
+            if all([time, day, city, state]) and not temp:
                 if day == date.today():
-                    now = datetime.now().time()
-                    one_hour_back = (
-                        datetime.combine(
-                            datetime.today(), now) - timedelta(hours=1)
-                    ).time()
-                    one_hour_forward = (
-                        datetime.combine(
-                            datetime.today(), now) + timedelta(hours=1)
-                    ).time()
-                    if one_hour_back <= time <= one_hour_forward:
+                    if is_time_within_range(time):
                         t = get_temperature(
-                            city_name=city, uf=state, date=date
+                            city_name=city, 
+                            uf=state, 
+                            date=f"{date.today()}"
                         )
                         if 'temp' in t:
-                            temperature = t['temp']
+                            temp = t['temp']
             instance = serializer.save()
-            if temperature:
-                instance.temperature = temperature
+            if temp:
+                instance.temperature = temp
                 instance.save()
                 return Response(
                     {"message": f"Saved."},
@@ -117,11 +142,38 @@ def post(request):
     request=WorkoutSerializer,
     examples=[
         OpenApiExample(
-            name='Update a instance by pk',
-            description='An instance must be created previously.',
+            name='Update location, date, and time to the current moment',
+            description='Update location, date, and time to the current moment. The system can only retrieve the temperature within a one-hour time window.',
             value={
-                '???': '???',
-                '???': '???'
+                "date": f"{date.today()}", 
+                "time_of_the_day": f"{datetime.now().strftime("%H:%M:%S")}",
+                "city": "Rio de Janeiro",
+                "state": "RJ"
+            }
+        ),
+        OpenApiExample(
+            name='Update location, date, time, and also the temperature to the current moment.',
+            description='Update location, date, and time to the current moment. The system saves the provided temperature.',
+            value={
+                "date": f"{date.today()}", 
+                "time_of_the_day": f"{datetime.now().strftime("%H:%M:%S")}",
+                "city": "Rio de Janeiro",
+                "state": "RJ",
+                "temperature": "100"
+            }
+        ),
+        OpenApiExample(
+            name='Update kilometers.',
+            description='Update kilometers. The system will recalculate the speed.',
+            value={
+                "kilometers": "10.00"
+            }
+        ),
+        OpenApiExample(
+            name='Update duration.',
+            description='Update duration. The system will recalculate the speed.',
+            value={
+                "duration": "02:00:00"
             }
         ),
     ],
@@ -140,7 +192,30 @@ def update(request, pk):
             instance, data=request.data, partial=True
         )
         if serializer.is_valid():
-            serializer.save()
+            obj = serializer.save()
+            data_day = serializer.validated_data.get('date', None)
+            data_city = serializer.validated_data.get('city', None)
+            data_state = serializer.validated_data.get('state', None)
+            temp = serializer.validated_data.get('temperature', None)
+            data_time = serializer.validated_data.get(
+                'time_of_the_day', None
+            )
+            if (data_time or data_day or data_city or data_state) \
+                and not temp:
+                obj.temperature = None
+                obj.save()
+            if all([data_time, data_day, data_city, data_state]) \
+                and not temp:
+                if obj.date == date.today():
+                    if is_time_within_range(obj.time_of_the_day):
+                        t = get_temperature(
+                            city_name=obj.city, 
+                            uf=obj.state, 
+                            date=f"{date.today()}"
+                        )
+                        if 'temp' in t:
+                            obj.temperature = t['temp']
+                            obj.save()
             return Response(
                 {"message": f"Successfully."},
                 status=status.HTTP_200_OK
