@@ -116,7 +116,7 @@ CORS_ALLOWED_ORIGINS = [
 ]
 #------------------------------------------------------------------------------
 SPECTACULAR_SETTINGS = {
-    'TITLE': 'CYCLING',
+    'TITLE': 'CYCLING - 8000',
     'DESCRIPTION': 'App for register your workouts of cycling',
     'VERSION': '1.0.0',
     'OAS_VERSION': '3.0.3',

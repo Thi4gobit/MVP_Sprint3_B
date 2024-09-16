@@ -209,7 +209,7 @@ class PostTestCase(TestCase):
 
     def test_post_007(self):
         """
-        Tiume is not now, time with more one hour
+        Time is not now, time with more one hour
         """
         instant = datetime.now() + timedelta(hours=1, minutes=1)
         data = {
@@ -356,7 +356,7 @@ class PostTestCase(TestCase):
     
     def test_post_012(self):
         """
-        Incorrectly format of the date
+        Incorrectly format of the time
         """
         data = {
             "date": TODAY, 
@@ -373,7 +373,7 @@ class PostTestCase(TestCase):
 
     def test_post_013(self):
         """
-        Incorrectly format of the date
+        Incorrectly format of the kilometer
         """
         instant = datetime.now()
         data = {
@@ -391,7 +391,7 @@ class PostTestCase(TestCase):
 
     def test_post_014(self):
         """
-        Incorrectly format of the date
+        Incorrectly format of the duration
         """
         instant = datetime.now()
         data = {

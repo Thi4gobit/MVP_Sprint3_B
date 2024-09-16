@@ -50,7 +50,7 @@ def get(request):
             description='',
             value={
                 "date": f"{date.today()}", 
-                "time": f"{datetime.now().strftime("%H:%M:%S")}",
+                "time_of_the_day": f"{datetime.now().strftime("%H:%M:%S")}",
                 "city": "Rio de Janeiro",
                 "state": "RJ",
                 "kilometers": "10.00", 
@@ -66,12 +66,12 @@ def post(request):
     if request.method == 'POST':
         serializer = WorkoutSerializer(data=request.data)
         if serializer.is_valid():
-            time = serializer.validated_data.get('time', None)
+            time = serializer.validated_data.get('time_of_the_day', None)
             day = serializer.validated_data.get('date', None)
             city = serializer.validated_data.get('city', None)
             state = serializer.validated_data.get('state', None)
             temperature = None
-            if time and date and city and state:
+            if time and day and city and state:
                 if day == date.today():
                     now = datetime.now().time()
                     one_hour_back = (

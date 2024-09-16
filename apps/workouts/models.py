@@ -5,7 +5,7 @@ from decimal import Decimal
 class Workout(models.Model):
 
     date = models.DateField(auto_now=False, auto_now_add=False)
-    time = models.TimeField(auto_now=False, auto_now_add=False, blank=True, null=True)
+    time_of_the_day = models.TimeField(auto_now=False, auto_now_add=False, blank=True, null=True)
     city = models.CharField(max_length=32, blank=True, null=True)
     state = models.CharField(max_length=32, blank=True, null=True)
     kilometers = models.DecimalField(max_digits=7, decimal_places=2)
