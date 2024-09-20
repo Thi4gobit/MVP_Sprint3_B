@@ -78,10 +78,10 @@ $ docker build -t django .
 Uma vez criada a imagem, para executar o container basta executar, **como administrador**, seguinte o comando:
 
 ```
-$ docker run -d --name flask --network mvp -p 5000:5000 django
+$ docker run -d --name django --network mvp -p 8000:8000 django
 ```
 
-Uma vez executado, para acessar a API, basta abrir o [http://localhost:5000/#/](http://localhost:5000/#/) no navegador.
+Uma vez executado, para acessar a API, basta abrir o [http://localhost:8000/#/](http://localhost:8000/#/) no navegador.
 
 
 ### Dicas
