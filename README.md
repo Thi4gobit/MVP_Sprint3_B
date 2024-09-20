@@ -3,8 +3,9 @@
 Este pequeno projeto faz parte do MVP do módulo da disciplina **Desenvolvimento Back-end Avançado** 
 
 As principais tecnologias que serão utilizadas aqui é o:
- - [Flask](https://flask.palletsprojects.com/en/2.3.x/)
- - [Flask-RESTX](https://flask-restx.readthedocs.io/en/latest/)
+ - [Django](https://docs.djangoproject.com/en/5.1/)
+ - [djangorestframework](https://www.django-rest-framework.org/)
+ - [drf-spectacular](https://drf-spectacular.readthedocs.io/en/latest/readme.html)
 
 ---
 ### Interoperabilidade
