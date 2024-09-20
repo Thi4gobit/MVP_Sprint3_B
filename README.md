@@ -11,7 +11,7 @@ As principais tecnologias que serão utilizadas aqui é o:
 ### Interoperabilidade
 
 Esta aplicação interage com outra API também escopo deste MVP. Para visualizar a outra API acesse:
- - [MPV_Sprint3_A](https://github.com/Thi4gobit/MVP_Sprint3_A)
+ - [MVP_Sprint3_A](https://github.com/Thi4gobit/MPV_Sprint3_A)
 
 ---
 ### Instalação
